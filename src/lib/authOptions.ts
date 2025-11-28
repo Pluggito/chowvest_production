@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./db";
 import bcrypt from "bcrypt";
-import type { PrismaClient } from "@prisma/client";
 
 // ------------------------------------------------------
 // 🔵 Module Augmentation (extends default NextAuth types)
@@ -22,14 +21,14 @@ declare module "next-auth" {
     id: string;
     email: string;
     name: string;
-    createdAt?: Date; // Add this
+    createdAt?: Date;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
-    createdAt?: string; // Add this
+    createdAt?: string;
   }
 }
 
@@ -37,7 +36,7 @@ declare module "next-auth/jwt" {
 // 🔵 NextAuth Options
 // ------------------------------------------------------
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma as unknown as PrismaClient),
+  adapter: PrismaAdapter(prisma as any), // ✅ Just pass prisma directly
 
   session: {
     strategy: "jwt",
@@ -65,7 +64,7 @@ export const authOptions: NextAuthOptions = {
             email: true,
             fullName: true,
             password: true,
-            createdAt: true, // ✅ Include createdAt here
+            createdAt: true,
           },
         });
 
@@ -84,7 +83,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.fullName ?? "",
-          createdAt: user.createdAt, // ✅ Pass createdAt
+          createdAt: user.createdAt,
         };
       },
     }),
@@ -95,7 +94,7 @@ export const authOptions: NextAuthOptions = {
       // On sign-in, add user data to token
       if (user) {
         token.id = user.id;
-        token.createdAt = user.createdAt?.toISOString(); // ✅ Convert to ISO string
+        token.createdAt = user.createdAt?.toISOString();
       }
 
       return token;
