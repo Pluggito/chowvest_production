@@ -7,37 +7,56 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import React, { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface UserProps {
   id: string;
   name: string;
   email: string;
-
+  location?: string | null;
+  phoneNumber?: string | null;
+  createdAt: string;
 }
+
 export function ProfileSettings({ user }: { user: UserProps }) {
+  const router = useRouter();
   const [updateFullName, setUpdateFullName] = useState("");
   const [updateEmail, setUpdateEmail] = useState("");
   const [updatePhone, setUpdatePhone] = useState("");
   const [updateLocation, setUpdateLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleUpdates = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
     try {
-      e.preventDefault();
       setIsLoading(true);
 
       const res = await axios.put(`/api/auth/current`, {
-        fullName: updateFullName || user.name,
-        email: updateEmail || user.email,
-        phoneNumber: updatePhone,
-        location: updateLocation,
+        fullName: updateFullName || undefined,
+        email: updateEmail || undefined,
+        phoneNumber: updatePhone || undefined,
+        location: updateLocation || undefined,
       });
 
       console.log("UPDATED", res.data);
+      setSuccess("Profile updated successfully!");
+      
+      // Clear form fields
+      setUpdateFullName("");
+      setUpdateEmail("");
+      setUpdatePhone("");
+      setUpdateLocation("");
+      
+      // Refresh the page to show updated data
+      router.refresh();
     } catch (error: unknown) {
       console.error(error);
-      let errorMessage = "Registration failed";
+      let errorMessage = "Update failed";
 
       if (axios.isAxiosError(error)) {
         const data = error.response?.data as { error?: string } | undefined;
@@ -58,13 +77,20 @@ export function ProfileSettings({ user }: { user: UserProps }) {
         <h3 className="text-xl font-semibold text-foreground mb-6">
           Personal Information
         </h3>
+        
         {error && (
-          <div className="p-3 rounded-md bg-red-50 border border-red-200">
+          <div className="p-3 rounded-md bg-red-50 border border-red-200 mb-4">
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
+        
+        {success && (
+          <div className="p-3 rounded-md bg-green-50 border border-green-200 mb-4">
+            <p className="text-sm text-green-600">{success}</p>
+          </div>
+        )}
 
-        <div className="space-y-4">
+        <form onSubmit={handleUpdates} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="fullname">Full Name</Label>
             <Input
@@ -94,7 +120,7 @@ export function ProfileSettings({ user }: { user: UserProps }) {
               id="phone"
               type="tel"
               name="phoneNumber"
-              placeholder="+234 801 234 5678"
+              placeholder={user.phoneNumber || "Enter phone number"}
               value={updatePhone}
               onChange={(e) => setUpdatePhone(e.target.value)}
               disabled={isLoading}
@@ -105,16 +131,16 @@ export function ProfileSettings({ user }: { user: UserProps }) {
             <Input
               id="location"
               name="location"
-              placeholder="Lagos, Nigeria"
+              placeholder={user.location || "Enter location"}
               value={updateLocation}
               onChange={(e) => setUpdateLocation(e.target.value)}
               disabled={isLoading}
             />
           </div>
-          <Button className="w-full" onClick={handleUpdates}>
-            Save Changes
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save Changes"}
           </Button>
-        </div>
+        </form>
       </Card>
 
       <Card className="p-6">

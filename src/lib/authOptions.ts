@@ -1,6 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./db";
 import bcrypt from "bcrypt";
 
@@ -14,6 +13,8 @@ declare module "next-auth" {
       name: string;
       email: string;
       createdAt: string;
+      location?: string | null; // ✅ Add these
+      phoneNumber?: string | null; // ✅ Add these
     };
   }
 
@@ -22,6 +23,8 @@ declare module "next-auth" {
     email: string;
     name: string;
     createdAt?: Date;
+    location?: string | null; // ✅ Add these
+    phoneNumber?: string | null; // ✅ Add these
   }
 }
 
@@ -29,6 +32,8 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     createdAt?: string;
+    location?: string | null; // ✅ Add these
+    phoneNumber?: string | null; // ✅ Add these
   }
 }
 
@@ -36,8 +41,6 @@ declare module "next-auth/jwt" {
 // 🔵 NextAuth Options
 // ------------------------------------------------------
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma as any), // ✅ Just pass prisma directly
-
   session: {
     strategy: "jwt",
   },
@@ -64,6 +67,8 @@ export const authOptions: NextAuthOptions = {
             email: true,
             fullName: true,
             password: true,
+            location: true,
+            phoneNumber: true,
             createdAt: true,
           },
         });
@@ -84,6 +89,8 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.fullName ?? "",
           createdAt: user.createdAt,
+          location: user.location,
+          phoneNumber: user.phoneNumber,
         };
       },
     }),
@@ -95,6 +102,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.createdAt = user.createdAt?.toISOString();
+        token.location = user.location; // ✅ Add to token
+        token.phoneNumber = user.phoneNumber; // ✅ Add to token
       }
 
       return token;
@@ -105,6 +114,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.createdAt = token.createdAt as string;
+        session.user.location = token.location; // ✅ Add to session
+        session.user.phoneNumber = token.phoneNumber; // ✅ Add to session
       }
       return session;
     },
