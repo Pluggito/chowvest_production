@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // stop turbopack from reading ANY sourcemaps
+  productionBrowserSourceMaps: false,
+  experimental: {
+    optimizePackageImports: ["@prisma/client"], // prevents sourcemap loading
+  },
+  turbopack: {},
 };
 
 export default nextConfig;
