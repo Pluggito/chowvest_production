@@ -1,66 +1,46 @@
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowDownToLine, ArrowUpFromLine, Repeat, ShoppingBag } from "lucide-react"
+"use client";
 
-const transactions = [
-  {
-    id: 1,
-    type: "deposit",
-    description: "Bank Transfer",
-    amount: 15000,
-    date: "Today, 2:30 PM",
-    status: "completed",
-  },
-  {
-    id: 2,
-    type: "transfer",
-    description: "Transfer to Rice Goal",
-    amount: -8000,
-    date: "Yesterday, 4:15 PM",
-    status: "completed",
-  },
-  {
-    id: 3,
-    type: "withdrawal",
-    description: "Withdrawal to Bank",
-    amount: -25000,
-    date: "Dec 28, 10:20 AM",
-    status: "completed",
-  },
-  {
-    id: 4,
-    type: "purchase",
-    description: "Purchased 50kg Beans",
-    amount: -42000,
-    date: "Dec 25, 3:45 PM",
-    status: "completed",
-  },
-  {
-    id: 5,
-    type: "deposit",
-    description: "Card Payment",
-    amount: 30000,
-    date: "Dec 22, 11:30 AM",
-    status: "completed",
-  },
-  {
-    id: 6,
-    type: "transfer",
-    description: "Transfer to Maize Goal",
-    amount: -5000,
-    date: "Dec 20, 9:15 AM",
-    status: "completed",
-  },
-]
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowDownToLine, ArrowUpFromLine, Repeat, ShoppingBag } from "lucide-react";
+import { useWalletStore } from "@/store/wallet-store";
+import { format, isToday, isYesterday } from "date-fns";
 
 const iconMap = {
-  deposit: ArrowDownToLine,
-  withdrawal: ArrowUpFromLine,
-  transfer: Repeat,
-  purchase: ShoppingBag,
-}
+  DEPOSIT: ArrowDownToLine,
+  WITHDRAWAL: ArrowUpFromLine,
+  TRANSFER_TO_BASKET: Repeat,
+  TRANSFER_FROM_BASKET: Repeat,
+  MARKET_PURCHASE: ShoppingBag,
+  REFUND: ArrowDownToLine,
+};
+
+const statusColors = {
+  PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  COMPLETED: "bg-green-100 text-green-800 border-green-200",
+  FAILED: "bg-red-100 text-red-800 border-red-200",
+  CANCELLED: "bg-gray-100 text-gray-800 border-gray-200",
+};
 
 export function TransactionHistory() {
+  const { transactions } = useWalletStore();
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    
+    if (isToday(date)) {
+      return `Today, ${format(date, "h:mm a")}`;
+    } else if (isYesterday(date)) {
+      return `Yesterday, ${format(date, "h:mm a")}`;
+    } else {
+      return format(date, "MMM d, h:mm a");
+    }
+  };
+
+  const isPositiveTransaction = (type: string) => {
+    return type === "DEPOSIT" || type === "REFUND" || type === "TRANSFER_FROM_BASKET";
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -72,40 +52,69 @@ export function TransactionHistory() {
       </div>
 
       <div className="space-y-3">
-        {transactions.map((transaction) => {
-          const Icon = iconMap[transaction.type as keyof typeof iconMap]
-          const isPositive = transaction.amount > 0
-
-          return (
-            <div
-              key={transaction.id}
-              className="flex items-center justify-between p-4 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                    isPositive ? "bg-primary/10" : "bg-muted"
-                  }`}
-                >
-                  <Icon className={`w-5 h-5 ${isPositive ? "text-primary" : "text-muted-foreground"}`} />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">{transaction.description}</p>
-                  <p className="text-sm text-muted-foreground">{transaction.date}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className={`font-semibold ${isPositive ? "text-primary" : "text-foreground"}`}>
-                  {isPositive ? "+" : ""}₦{Math.abs(transaction.amount).toLocaleString()}
-                </p>
-                <Badge variant="secondary" className="text-xs mt-1">
-                  {transaction.status}
-                </Badge>
-              </div>
+        {transactions.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
+              <ArrowDownToLine className="w-8 h-8 text-muted-foreground" />
             </div>
-          )
-        })}
+            <p className="text-muted-foreground font-medium">No transactions yet</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Make your first deposit to get started
+            </p>
+          </div>
+        ) : (
+          transactions.map((transaction) => {
+            const Icon = iconMap[transaction.type as keyof typeof iconMap] || Repeat;
+            const isPositive = isPositiveTransaction(transaction.type);
+
+            return (
+              <div
+                key={transaction.id}
+                className="flex items-center justify-between p-4 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      isPositive ? "bg-primary/10" : "bg-muted"
+                    }`}
+                  >
+                    <Icon
+                      className={`w-5 h-5 ${
+                        isPositive ? "text-primary" : "text-muted-foreground"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">
+                      {transaction.description}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(transaction.createdAt)}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p
+                    className={`font-semibold ${
+                      isPositive ? "text-primary" : "text-foreground"
+                    }`}
+                  >
+                    {isPositive ? "+" : ""}₦
+                    {Math.abs(transaction.amount).toLocaleString()}
+                  </p>
+                  <Badge
+                    className={`text-xs mt-1 border ${
+                      statusColors[transaction.status as keyof typeof statusColors]
+                    }`}
+                  >
+                    {transaction.status.toLowerCase()}
+                  </Badge>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </Card>
-  )
+  );
 }

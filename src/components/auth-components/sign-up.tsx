@@ -47,7 +47,7 @@ export function SignUp({ onToggle }: SignUpProps) {
       //router.push("/auth/signin?registered=true");
       // Or redirect to dashboard if you want to auto-login
 
-       router.push('/dashboard')
+       router.push('/dashboard');
 
     } catch (error: unknown) {
       console.error(error);
