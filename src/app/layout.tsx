@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 //import { Navigation } from "@/components/navigation"
-import { Suspense } from "react"
+import { Suspense } from "react";
+import { Providers } from "../providers/providers";
+import { UserSyncProvider } from "@/providers/user-sync-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +31,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${geistSans.variable} ${geistMono.variable}`}>
         <Suspense fallback={<div>Loading...</div>}>
-          <main className=" pb-24 md:pb-8">{children}</main>
+          <Providers>
+            <UserSyncProvider>
+              <main className=" pb-24 md:pb-8">{children}</main>
+              <Toaster position="top-right" richColors/>
+            </UserSyncProvider>
+          </Providers>
         </Suspense>
       </body>
     </html>

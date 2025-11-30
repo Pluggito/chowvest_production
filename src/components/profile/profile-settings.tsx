@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import React, { useState } from "react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/user-store";
 
 interface UserProps {
   id: string;
@@ -19,7 +21,10 @@ interface UserProps {
 }
 
 export function ProfileSettings({ user }: { user: UserProps }) {
+  const { update } = useSession();
   const router = useRouter();
+  const setUser = useUserStore((state) => state.setUser);
+  
   const [updateFullName, setUpdateFullName] = useState("");
   const [updateEmail, setUpdateEmail] = useState("");
   const [updatePhone, setUpdatePhone] = useState("");
@@ -44,16 +49,37 @@ export function ProfileSettings({ user }: { user: UserProps }) {
       });
 
       console.log("UPDATED", res.data);
-      setSuccess("Profile updated successfully!");
       
+      // ✅ Update Zustand store immediately for instant UI feedback
+      setUser({
+        id: res.data.user.id,
+        fullName: res.data.user.fullName,
+        email: res.data.user.email,
+        phoneNumber: res.data.user.phoneNumber || "",
+        location: res.data.user.location || "",
+        createdAt: res.data.user.createdAt,
+      });
+
+      // ✅ Trigger NextAuth session update
+      await update({
+        user: {
+          name: res.data.user.fullName,
+          email: res.data.user.email,
+          location: res.data.user.location,
+          phoneNumber: res.data.user.phoneNumber,
+        },
+      });
+
+      // ✅ Force router refresh to get updated session from server
+      router.refresh();
+
+      setSuccess("Profile updated successfully!");
+
       // Clear form fields
       setUpdateFullName("");
       setUpdateEmail("");
       setUpdatePhone("");
       setUpdateLocation("");
-      
-      // Refresh the page to show updated data
-      router.refresh();
     } catch (error: unknown) {
       console.error(error);
       let errorMessage = "Update failed";
@@ -77,13 +103,13 @@ export function ProfileSettings({ user }: { user: UserProps }) {
         <h3 className="text-xl font-semibold text-foreground mb-6">
           Personal Information
         </h3>
-        
+
         {error && (
           <div className="p-3 rounded-md bg-red-50 border border-red-200 mb-4">
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
-        
+
         {success && (
           <div className="p-3 rounded-md bg-green-50 border border-green-200 mb-4">
             <p className="text-sm text-green-600">{success}</p>

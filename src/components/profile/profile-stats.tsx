@@ -1,14 +1,13 @@
+"use client";
 import { Card } from "@/components/ui/card";
 import { Target, TrendingUp, Award, Calendar } from "lucide-react";
+import { useUserStore } from "@/store/user-store";
 
-interface UserProps {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string; // ✅ Add this to the type
-}
+export function ProfileStats() {
+  const user = useUserStore((state) => state);
 
-export function ProfileStats({ user }: { user: UserProps }) {
+  if (!user) return null;
+
   const stats = [
     {
       label: "Harvests Completed",

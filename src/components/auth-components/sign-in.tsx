@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUserStore } from "@/store/user-store";
+import { getSession } from "next-auth/react";
 
 interface SignInProps {
   onToggle: () => void;
@@ -18,6 +20,8 @@ export function SignIn({ onToggle }: SignInProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const { setUser } = useUserStore()
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +40,19 @@ export function SignIn({ onToggle }: SignInProps) {
       setErrorMsg("Invalid email or password.");
       return;
     }
+
+      const session = await getSession();
+   
+    if(session?.user){
+      setUser({
+        id: session.user.id,
+        fullName: session.user.name,
+        email: session.user.email,
+        phoneNumber: session.user.phoneNumber ?? "",
+        location: session.user.location ?? "",
+        createdAt: session.user.createdAt
+      })
+    }    
 
     // Successful login → redirect
     router.push("/dashboard");
