@@ -1,15 +1,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useUserStore } from "@/store/user-store";
 import { Camera, MapPin } from "lucide-react";
+import { signOut } from "next-auth/react";
 
-interface UserProps {
-  id: string;
-  name: string;
-  email: string;
-}
+export function ProfileHeader() {
+  const user = useUserStore((state) => state);
+  const resetUser = useUserStore((state) => state.resetUser);
 
-export function ProfileHeader({ user }: { user: UserProps }) {
+  const handleLogout = () => {
+    resetUser();
+    signOut({ callbackUrl: "/auth" });
+  };
+
   return (
     <Card className="p-6">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -17,7 +21,7 @@ export function ProfileHeader({ user }: { user: UserProps }) {
           <Avatar className="w-24 h-24">
             <AvatarImage src="/placeholder.svg?height=96&width=96" />
             <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-              JD
+              {user.fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
             </AvatarFallback>
           </Avatar>
           <Button
@@ -30,13 +34,23 @@ export function ProfileHeader({ user }: { user: UserProps }) {
         </div>
 
         <div className="flex-1 text-center md:text-left">
-          <h1 className="text-2xl font-bold text-foreground">{user.name}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {user.fullName}
+          </h1>
           <p className="text-muted-foreground mt-1">{user.email}</p>
           <div className="flex items-center justify-center md:justify-start gap-2 mt-2 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4" />
-            <span>Lagos, Nigeria</span>
+            <span>{user.location}</span>
           </div>
         </div>
+
+        <Button
+          variant={"outline"}
+          className="mt-5 font-semibold cursor-pointer"
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
       </div>
     </Card>
   );

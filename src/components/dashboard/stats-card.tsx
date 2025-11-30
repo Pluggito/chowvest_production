@@ -1,6 +1,11 @@
 import { Card } from "@/components/ui/card"
+import { useWalletStore } from "@/store/wallet-store"
 import { Wallet, TrendingUp, Target } from "lucide-react"
 
+
+
+export function StatsCards() {
+  const { balance } = useWalletStore()
 const stats = [
   {
     label: "Total Savings",
@@ -11,7 +16,7 @@ const stats = [
   },
   {
     label: "Wallet Balance",
-    value: "₦45,200",
+    value: `₦${balance.toLocaleString()}`,
     change: "Available in your wallet",
     icon: Wallet,
     trend: "neutral",
@@ -25,7 +30,6 @@ const stats = [
   },
 ]
 
-export function StatsCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {stats.map((stat) => {

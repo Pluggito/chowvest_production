@@ -1,52 +1,66 @@
-"use client"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/db";
+import { WalletPageClient } from "./client-wrapper";
+import { WalletSync } from "@/hooks/wallet-sync";
 
-import { Navigation } from "@/components/navigation"
-import { WalletHeader } from "@/components/wallet/wallet-header"
-import { WalletBalance } from "@/components/wallet/wallet-balance"
-import { TransactionHistory } from "@/components/wallet/transaction-history"
-import { QuickTransfer } from "@/components/wallet/quick-transfer"
-import { useIsMobile } from "@/hooks/use-mobile"
+export default async function WalletPage() {
+  const session = await getServerSession(authOptions);
 
-export default function WalletPage() {
-  const isMobile = useIsMobile();
+  if (!session?.user) {
+    redirect("/auth");
+  }
+
+  // Get or create wallet
+  let wallet = await prisma.wallet.findUnique({
+    where: { userId: session.user.id },
+    include: {
+      transactions: {
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      },
+    },
+  });
+
+  if (!wallet) {
+    wallet = await prisma.wallet.create({
+      data: { userId: session.user.id },
+      include: { transactions: true },
+    });
+  }
+
+  // Get user's baskets
+  const baskets = await prisma.basket.findMany({
+    where: { userId: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      goalAmount: true,
+      currentAmount: true,
+    },
+  });
+
+  // Serialize wallet data for client
+  const serializedWallet = {
+    balance: wallet.balance,
+    totalDeposits: wallet.totalDeposits,
+    totalSpent: wallet.totalSpent,
+    transactions: wallet.transactions.map((t) => ({
+      id: t.id,
+      type: t.type,
+      amount: t.amount,
+      description: t.description,
+      status: t.status,
+      createdAt: t.createdAt.toISOString(),
+      basketId: t.basketId,
+    })),
+  };
 
   return (
     <>
-      <Navigation />
-      <div className="container mx-auto px-4 md:px-6 space-y-6 pt-20 pb-24 md:pb-8">
-        <WalletHeader />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content Area */}
-          {isMobile ? (
-            <>
-              <div className="lg:col-span-2 space-y-6">
-                <WalletBalance />
-                <QuickTransfer />
-              </div>
-              {/* Sidebar Area */}
-              <div>
-                <TransactionHistory />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="lg:col-span-2 space-y-6">
-                <WalletBalance />
-                <TransactionHistory />
-              </div>
-              {/* Sidebar Area */}
-              <div>
-                <QuickTransfer />
-              </div>
-            </>
-          )}
-
-        </div>
-      </div>
+      <WalletSync wallet={serializedWallet} />
+      <WalletPageClient baskets={baskets} />
     </>
-  )
+  );
 }
-
-
-
-      
