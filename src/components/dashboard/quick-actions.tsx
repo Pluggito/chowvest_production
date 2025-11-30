@@ -1,35 +1,51 @@
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Plus, ArrowUpRight, Repeat, Package } from "lucide-react"
+"use client";
 
-const actions = [
-  {
-    label: "Add Money",
-    icon: Plus,
-    variant: "default" as const,
-  },
-  {
-    label: "Request Delivery",
-    icon: Package,
-    variant: "outline" as const,
-  },
-]
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, Package } from "lucide-react";
+import { DepositModal } from "@/components/wallet/deposit-modal";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function QuickActions() {
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const router = useRouter();
+
+  const handleAddMoney = () => {
+    setDepositModalOpen(true);
+  };
+
+  const handleRequestDelivery = () => {
+    // Navigate to delivery page or open delivery modal
+    router.push("/delivery");
+    // Or open a delivery modal: setDeliveryModalOpen(true);
+  };
+
   return (
-    <Card className="p-6">
-      <h3 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h3>
-      <div className="space-y-3">
-        {actions.map((action) => {
-          const Icon = action.icon
-          return (
-            <Button key={action.label} variant={action.variant} className="w-full justify-start gap-3 h-12">
-              <Icon className="w-5 h-5" />
-              {action.label}
-            </Button>
-          )
-        })}
-      </div>
-    </Card>
-  )
+    <>
+      <Card className="p-6">
+        <h3 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h3>
+        <div className="space-y-3">
+          <Button
+            variant="default"
+            className="w-full justify-start gap-3 h-12"
+            onClick={handleAddMoney}
+          >
+            <Plus className="w-5 h-5" />
+            Add Money
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-3 h-12"
+            onClick={handleRequestDelivery}
+          >
+            <Package className="w-5 h-5" />
+            Request Delivery
+          </Button>
+        </div>
+      </Card>
+
+      <DepositModal open={depositModalOpen} onOpenChange={setDepositModalOpen} />
+    </>
+  );
 }

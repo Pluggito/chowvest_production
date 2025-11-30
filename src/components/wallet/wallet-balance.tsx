@@ -45,7 +45,7 @@ export function WalletBalance() {
             {showBalance ? formatCurrency(balance) : "₦••,•••"}
           </p>
           <p className="text-sm opacity-80">
-            +{showBalance ? formatCurrency(monthlyIncrease) : "₦•,•••"} this month
+            +{showBalance ? formatCurrency(monthlyIncrease) : "₦•••,•••"} this month
           </p>
         </div>
 

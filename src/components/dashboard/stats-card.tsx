@@ -1,46 +1,56 @@
-import { Card } from "@/components/ui/card"
-import { useWalletStore } from "@/store/wallet-store"
-import { Wallet, TrendingUp, Target } from "lucide-react"
-
-
+import { Card } from "@/components/ui/card";
+import { useWalletStore } from "@/store/wallet-store";
+import { Wallet, TrendingUp, Target } from "lucide-react";
 
 export function StatsCards() {
-  const { balance } = useWalletStore()
-const stats = [
-  {
-    label: "Total Savings",
-    value: "₦125,450",
-    change: "Total saved towards food",
-    icon: TrendingUp,
-    trend: "up",
-  },
-  {
-    label: "Wallet Balance",
-    value: `₦${balance.toLocaleString()}`,
-    change: "Available in your wallet",
-    icon: Wallet,
-    trend: "neutral",
-  },
-  {
-    label: "Current Food Plans",
-    value: "4",
-    change: "2 near completion",
-    icon: Target,
-    trend: "up",
-  },
-]
+  const { balance } = useWalletStore();
+
+  const stats = [
+    {
+      label: "Total Savings",
+      value: "₦125,450",
+      change: "Total saved towards food",
+      icon: TrendingUp,
+      trend: "up",
+    },
+    {
+      label: "Wallet Balance",
+      value: `₦${balance.toLocaleString()}`,
+      change: "Available in your wallet",
+      icon: Wallet,
+      trend: "neutral",
+    },
+    {
+      label: "Current Food Plans",
+      value: "4",
+      change: "2 near completion",
+      icon: Target,
+      trend: "up",
+    },
+  ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {stats.map((stat) => {
-        const Icon = stat.icon
+        const Icon = stat.icon;
         return (
-          <Card key={stat.label} className="p-6 bg-gradient-to-br from-card to-accent/20 border-border/50">
+          <Card
+            key={stat.label}
+            className="p-6 bg-gradient-to-br from-card to-accent/20 border-border/50"
+          >
             <div className="flex items-start justify-between">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                <p className={`text-sm ${stat.trend === "up" ? "text-primary" : "text-muted-foreground"}`}>
+                <p className="text-3xl font-bold text-foreground">
+                  {stat.value}
+                </p>
+                <p
+                  className={`text-sm ${
+                    stat.trend === "up"
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  }`}
+                >
                   {stat.change}
                 </p>
               </div>
@@ -49,8 +59,8 @@ const stats = [
               </div>
             </div>
           </Card>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
