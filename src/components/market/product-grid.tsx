@@ -1,7 +1,7 @@
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, Heart } from "lucide-react"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingCart, Heart } from "lucide-react";
 
 const products = [
   {
@@ -9,7 +9,7 @@ const products = [
     name: "Premium Rice",
     description: "50kg bag of high-quality rice",
     price: 45000,
-    image: "/rice-bag.png",
+    image: "/rice.jpg",
     category: "Foodstuff",
     inStock: true,
     discount: 10,
@@ -19,7 +19,7 @@ const products = [
     name: "Brown Beans",
     description: "100kg sack of brown beans",
     price: 85000,
-    image: "/beans-sack.jpg",
+    image: "/beans.jpg",
     category: "Foodstuff",
     inStock: true,
   },
@@ -37,7 +37,7 @@ const products = [
     name: "White Garri",
     description: "50kg bag of white garri",
     price: 35000,
-    image: "/garri-bag.jpg",
+    image: "/garri.jpg",
     category: "Foodstuff",
     inStock: true,
     discount: 5,
@@ -60,13 +60,16 @@ const products = [
     category: "Cash Crops",
     inStock: false,
   },
-]
+];
 
 export function ProductGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
-        <Card key={product.id} className="overflow-hidden group hover:shadow-xl transition-shadow">
+        <Card
+          key={product.id}
+          className="overflow-hidden group hover:shadow-xl transition-shadow"
+        >
           <div className="relative">
             <img
               src={product.image || "/placeholder.svg"}
@@ -90,25 +93,37 @@ export function ProductGrid() {
           <div className="p-5 space-y-3">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-semibold text-foreground">{product.name}</h3>
+                <h3 className="font-semibold text-foreground">
+                  {product.name}
+                </h3>
                 <Badge variant="secondary" className="text-xs">
                   {product.category}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">{product.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {product.description}
+              </p>
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-border">
               <div>
                 {product.discount ? (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground line-through">₦{product.price.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground line-through">
+                      ₦{product.price.toLocaleString()}
+                    </p>
                     <p className="text-xl font-bold text-foreground">
-                      ₦{((product.price * (100 - product.discount)) / 100).toLocaleString()}
+                      ₦
+                      {(
+                        (product.price * (100 - product.discount)) /
+                        100
+                      ).toLocaleString()}
                     </p>
                   </div>
                 ) : (
-                  <p className="text-xl font-bold text-foreground">₦{product.price.toLocaleString()}</p>
+                  <p className="text-xl font-bold text-foreground">
+                    ₦{product.price.toLocaleString()}
+                  </p>
                 )}
               </div>
               <Button disabled={!product.inStock} className="gap-2">
@@ -120,5 +135,5 @@ export function ProductGrid() {
         </Card>
       ))}
     </div>
-  )
+  );
 }

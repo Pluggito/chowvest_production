@@ -18,12 +18,27 @@ import { toast } from "sonner";
 import axios from "axios";
 
 const commodities = [
-  { value: "rice", label: "Rice (50kg)", price: 45000, image: "/rice-bag.png" },
-  { value: "beans", label: "Beans (100kg)", price: 85000, image: "/beans-sack.jpg" },
-  { value: "maize", label: "Maize Seeds (10kg)", price: 25000, image: "/maize-seeds.jpg" },
-  { value: "garri", label: "Garri (50kg)", price: 35000, image: "/garri-bag.jpg" },
-  { value: "yam", label: "Yam Tubers (100kg)", price: 55000, image: "/yam-tubers.jpg" },
-  { value: "cassava", label: "Cassava (100kg)", price: 40000, image: "/cassava-stems.jpg" },
+  { value: "rice", label: "Rice (50kg)", price: 45000, image: "/rice.jpg" },
+  { value: "beans", label: "Beans (100kg)", price: 85000, image: "/beans.jpg" },
+  {
+    value: "maize",
+    label: "Maize Seeds (10kg)",
+    price: 25000,
+    image: "/maize-seeds.jpg",
+  },
+  { value: "garri", label: "Garri (50kg)", price: 35000, image: "/garri.jpg" },
+  {
+    value: "yam",
+    label: "Yam Tubers (100kg)",
+    price: 55000,
+    image: "/yam-tubers.jpg",
+  },
+  {
+    value: "cassava",
+    label: "Cassava (100kg)",
+    price: 40000,
+    image: "/cassava-stems.jpg",
+  },
 ];
 
 export function CreateGoalCard() {
@@ -84,13 +99,18 @@ export function CreateGoalCard() {
         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
           <Plus className="w-5 h-5 text-primary" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground">Create New Goal</h3>
+        <h3 className="text-xl font-semibold text-foreground">
+          Create New Goal
+        </h3>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="commodity">Select Commodity</Label>
-          <Select value={selectedCommodity} onValueChange={handleCommodityChange}>
+          <Select
+            value={selectedCommodity}
+            onValueChange={handleCommodityChange}
+          >
             <SelectTrigger id="commodity">
               <SelectValue placeholder="Choose a commodity" />
             </SelectTrigger>
@@ -137,7 +157,9 @@ export function CreateGoalCard() {
         <Button
           className="w-full mt-4"
           onClick={handleCreateGoal}
-          disabled={isLoading || !selectedCommodity || !targetAmount || !targetDate}
+          disabled={
+            isLoading || !selectedCommodity || !targetAmount || !targetDate
+          }
         >
           {isLoading ? "Creating..." : "Create Goal"}
         </Button>
