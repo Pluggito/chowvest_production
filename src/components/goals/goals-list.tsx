@@ -57,12 +57,9 @@ export function GoalsList() {
     try {
       setIsLoading(true);
 
-      const res = await axios.post(
-        `/api/baskets/${selectedBasket}/add-funds`,
-        {
-          amount: parseFloat(amount),
-        }
-      );
+      const res = await axios.post(`/api/baskets/${selectedBasket}/add-funds`, {
+        amount: parseFloat(amount),
+      });
 
       // Update local state
       updateBalance(-parseFloat(amount));
@@ -106,9 +103,12 @@ export function GoalsList() {
           const remaining = goal.goalAmount - goal.currentAmount;
 
           return (
-            <Card key={goal.id} className="p-6 hover:shadow-lg transition-shadow">
+            <Card
+              key={goal.id}
+              className="p-6 hover:shadow-lg transition-shadow"
+            >
               <div className="flex flex-col md:flex-row gap-6">
-                <img
+                <Image
                   src={goal.image || "/placeholder.svg"}
                   alt={goal.name}
                   width={100}
@@ -174,7 +174,9 @@ export function GoalsList() {
 
                   <div className="flex items-center justify-between pt-2 border-t border-border">
                     <div>
-                      <p className="text-xs text-muted-foreground">Regular Top-Up</p>
+                      <p className="text-xs text-muted-foreground">
+                        Regular Top-Up
+                      </p>
                       <p className="text-sm font-semibold text-foreground">
                         ₦{goal.regularTopUp?.toLocaleString() || "0"}
                       </p>
